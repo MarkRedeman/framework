@@ -26,6 +26,23 @@ class PipelineTest extends PHPUnit_Framework_TestCase {
 		unset($_SERVER['__test.pipe.two']);
 	}
 
+	public function testPipelineUsesAnInstanceOfAMiddleware($value='')
+	{
+		$instance = new PipelineTestPipeOne;
+
+		$result = (new Pipeline(new Illuminate\Container\Container))
+			->send('foo')
+			->through([$instance])
+			->then(function($piped) {
+				return $piped;
+			});
+
+		$this->assertEquals('foo', $result);
+		$this->assertEquals('foo', $_SERVER['__test.pipe.one']);
+
+		unset($_SERVER['__test.pipe.one']);
+	}
+
 }
 
 class PipelineTestPipeOne {
